@@ -1,0 +1,2 @@
+float64 left_joystick_y_axis
+float64 right_joystick_x_axis
