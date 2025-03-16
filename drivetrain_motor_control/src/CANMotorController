@@ -1,0 +1,59 @@
+#include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/twist.hpp"
+#include "std_msgs/msg/string.hpp"
+#include "sparkcan/motor.hpp"
+
+using namespace std::chrono_literals;
+
+class CanMotorDriver : public rclcpp::Node
+{
+public:
+    CanMotorDriver()
+        : Node("can_motor_driver")
+    {
+        // Initialize all drivetrain motors 1 - 6
+        motors_[0] = std::make_shared<sparkcan::Motor>(0x01, "can0"); // Motor 1
+        motors_[1] = std::make_shared<sparkcan::Motor>(0x02, "can0"); // Motor 2
+        motors_[2] = std::make_shared<sparkcan::Motor>(0x03, "can0"); // Motor 3
+        motors_[3] = std::make_shared<sparkcan::Motor>(0x04, "can0"); // Motor 4
+        motors_[4] = std::make_shared<sparkcan::Motor>(0x05, "can0"); // Motor 5
+        motors_[5] = std::make_shared<sparkcan::Motor>(0x06, "can0"); // Motor 6
+
+        // Subscribe to velocity commands
+        subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
+            "cmd_vel", 10, std::bind(&CanMotorDriver::velocity_callback, this, std::placeholders::_1));
+
+        // Publisher for motor status
+        publisher_ = this->create_publisher<std_msgs::msg::String>("motor_status", 10);
+    }
+
+private:
+    void velocity_callback(const geometry_msgs::msg::Twist::SharedPtr msg)
+    {
+        float speed = msg->linear.x;  // Assuming a single speed control for all motors
+        RCLCPP_INFO(this->get_logger(), "Received speed: %f", speed);
+
+        // Set motor speeds
+        for (int i = 0; i < 6; i++)
+        {
+            motors_[i]->set_duty_cycle(speed);
+        }
+
+        // Publish status
+        auto status_msg = std_msgs::msg::String();
+        status_msg.data = "Set all motors to speed: " + std::to_string(speed);
+        publisher_->publish(status_msg);
+    }
+
+    std::shared_ptr<sparkcan::Motor> motors_[6];  // Array of motor objects
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+};
+
+int main(int argc, char **argv)
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<CanMotorDriver>());
+    rclcpp::shutdown();
+    return 0;
+}
