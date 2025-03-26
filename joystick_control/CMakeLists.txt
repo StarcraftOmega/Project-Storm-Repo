@@ -7,9 +7,33 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(drivetrain_interfaces REQUIRED)
+
+# Add external joystick library (assuming it's inside external/joystick)
+add_subdirectory(external/joystick)
+
+add_executable(joystick_node src/publisher_joystick.cpp)
+
+# Link against joystick + ROS2
+target_link_libraries(joystick_node
+  joystick
+)
+
+target_include_directories(joystick_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external/joystick>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+)
+
+install(TARGETS
+  joystick_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_target_dependencies(joystick_node
+  rclcpp
+  drivetrain_interfaces
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
