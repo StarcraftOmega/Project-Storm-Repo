@@ -3,6 +3,8 @@ from rclpy.node import Node
 from std_msgs.msg import String
 from pynput import keyboard
 
+# USE ROS_DOMAIN_ID:48 befor launch
+
 class RemoteKeyboardNode(Node):
     def __init__(self):
         super().__init__('remote_keyboard_node')

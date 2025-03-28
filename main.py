@@ -3,6 +3,8 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import subprocess
 
+# USE ROS_DOMAIN_ID:48 befor launch
+
 class MainNode(Node):
     def __init__(self):
         super().__init__('main_node')
@@ -37,7 +39,7 @@ class MainNode(Node):
         self.get_logger().info(f"Processing system command: {command}")
         if command == '1':
             self.launch_group(1, [
-                ('package1', 'node1_executable'),
+                ('joystick_cotrol/src', 'publisher_joystick'),
                 ('package2', 'node2_executable')
             ])
         elif command == '2':
