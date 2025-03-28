@@ -1,0 +1,13 @@
+[Unit]
+Description=Start Jetson ROS2 Node
+After=network.target  # Ensures network is ready
+
+[Service]
+Type=simple
+User=jetson  # Replace "jetson" with your username
+ExecStart=/usr/local/bin/jetson_main.sh
+Restart=on-failure  # Auto-restart if the node crashes
+Environment="ROS_VERSION=2"  # Optional: Set ROS2 environment variables if needed
+
+[Install]
+WantedBy=multi-user.target  # Start at boot

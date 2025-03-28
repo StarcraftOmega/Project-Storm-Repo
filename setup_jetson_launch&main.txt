@@ -1,0 +1,27 @@
+
+For jetson_launch.sh
+# Save it as /usr/local/bin/jetson_main.sh
+# sudo chmod +x /usr/local/bin/jetson_main.sh
+
+
+for jetson_main.service
+Save it as 
+#/etc/systemd/system/jetson_main.service
+
+
+Step 3: Enable and Start the Service
+Reload systemd to recognize the new service:
+#sudo systemctl daemon-reload
+
+Enable the service to run at boot:
+#sudo systemctl enable jetson_main.service
+
+Start the service immediately (no reboot needed):
+#sudo systemctl start jetson_main.service
+
+
+Verify the Service
+Check the service status:
+#sudo systemctl status jetson_main.service
+View logs (for debugging):
+#journalctl -u jetson_main.service -f
